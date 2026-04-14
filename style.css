@@ -1,0 +1,37 @@
+button {
+  width: 100px;
+  height: 50px;
+  background: rgb(63, 0, 121);
+  color:  #ffb700;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 120px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+h1 {
+  color: #ffb700;
+  font-family: 'courier new', sans-serif;
+}
+h2 {
+  color: #ffb700;
+  font-family: 'courier new', sans-serif;
+}
+h3 {
+  color: #ffb700;
+  font-family: 'courier new', sans-serif;
+}
+noscript {
+  color: #ffb700;
+  font-family: 'courier new', sans-serif;
+}
