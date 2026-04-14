@@ -1,7 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>button</title>
+    <style>
+        
 button {
   width: 100px;
   height: 50px;
-  background:  #2bff006b;
+  background:  #18201614;
   color: rgb(21, 255, 0);
   border: none;
   padding: 12px 24px;
@@ -14,3 +22,7 @@ button:hover {
   opacity: 0.8;
   transform: scale(1.05);
 }
+    </style>
+</head>
+<body>
+    <button>Click Me</button>
