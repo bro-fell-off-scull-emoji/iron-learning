@@ -3,6 +3,7 @@
 <head>
   <title>Games</title>
 <link rel="stylesheet" href="style.css">
+  
  <div id="menu">
   <button class="gameBtn" onclick="startGame('games/adofai/index.html')">A Dance of Fire and Ice</button>
   <button class="gameBtn" onclick="startGame('games/adventurecapital/index.html')">Adventure Capitalist</button>
@@ -26,7 +27,6 @@ function startGame(url) {
   document.getElementById("menu").style.display = "none";
   document.getElementById("topBar").style.display = "block";
   document.getElementById("gameFrame").style.display = "block";
-
   document.getElementById("gameFrame").src = url;
 }
 
