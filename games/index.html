@@ -2,16 +2,20 @@
 <html>
 <head>
   <title>Games</title>
+<link rel="stylesheet" href="style.css">
 <style>
-  #gameFrame {
+#gameFrame {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   border: none;
-  display: none;
+
+  display: none;        /* hidden by default */
   z-index: 999;
+
+  pointer-events: none;
 }
 </style>
   
