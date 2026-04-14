@@ -27,7 +27,7 @@ function startGame(url) {
   document.getElementById("menu").style.display = "none";
   document.getElementById("topBar").style.display = "block";
   document.getElementById("gameFrame").style.display = "block";
-  
+  document.getElementById("gameFrame").src = url;
 }
 
 function goBack() {
@@ -56,8 +56,6 @@ async function openBlob() {
 
 </body>
 </html>
-  document.getElementById("gameFrame").src = url;
-}
 </script>
 
 </body>
