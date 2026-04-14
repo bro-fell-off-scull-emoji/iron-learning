@@ -35,3 +35,11 @@ noscript {
   color: #ffb700;
   font-family: 'courier new', sans-serif;
 }
+#gameFrame {
+  position: fixed;
+  top: 50px; /* height of top bar */
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 50px);
+  border: none;
+}
