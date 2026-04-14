@@ -61,6 +61,33 @@ function startGame(url) {
 document.getElementById("gameFrame").src = url;
 }
 </script>
+<script>
+let currentGame = "";
+
+function startGame(url) {
+  currentGame = url;
+
+  // hide buttons
+  document.getElementById("menu").style.display = "none";
+
+  // show game
+  const frame = document.getElementById("gameFrame");
+  frame.style.display = "block";
+  frame.src = url;
+}
+
+function goBack() {
+  const frame = document.getElementById("gameFrame");
+
+  // hide game
+  frame.style.display = "none";
+  frame.src = "";
+
+  // show buttons again
+  document.getElementById("menu").style.display = "block";
+}
+</script>
+
 
 </body>
 </html>
