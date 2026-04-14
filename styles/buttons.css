@@ -1,7 +1,7 @@
 button {
   width: 100px;
   height: 50px;
-  background: linear-gradient(45deg, #2bff006b, #3333ff);
+  background:  #2bff006b;
   color: rgb(21, 255, 0);
   border: none;
   padding: 12px 24px;
@@ -13,3 +13,4 @@ button {
 button:hover {
   opacity: 0.8;
   transform: scale(1.05);
+}
