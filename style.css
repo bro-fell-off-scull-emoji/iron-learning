@@ -19,6 +19,9 @@ iframe {
   height: 100%;
   border: none;
 }
+::backdrop {
+  background: rgba(138, 0, 0, 0.696);
+}
 h1 {
   color: #ffb700;
   font-family: 'courier new', sans-serif;
