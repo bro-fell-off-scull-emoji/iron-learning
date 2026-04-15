@@ -8,8 +8,15 @@ button {
   border-radius: 120px;
   cursor: pointer;
   transition: 0.3s;
+  position: center;
 }
-
+body {
+  background: maroon;
+  margin: 0;
+  padding: 0;
+position: center;
+justify-content: center;
+}
 button:hover {
   opacity: 0.8;
   transform: scale(1.05);
@@ -19,11 +26,6 @@ iframe {
   height: 100%;
   border: none;
 }
-body {
-  margin: 0;
-  background: #410202;
-}
-
 h1 {
   color: #ffb700;
   font-family: 'courier new', sans-serif;
