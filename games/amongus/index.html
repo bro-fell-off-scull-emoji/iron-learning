@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Games</title>
+<link rel="stylesheet" href="style.css">
+<style>
+#menu {
+  display: block;
+}
+
+#topBar {
+  height: 50px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+ #gameFrame {
+  position: fixed;
+  top: 50px;   /* space for top bar */
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 50px);
+  border: none;
+  display: none;
+}
+</style>
+  
+ <div id="menu">
+  <button class="gameBtn" onclick="startGame('adofai/index.html')">A Dance of Fire and Ice</button>
+  <button class="gameBtn" onclick="startGame('adventurecapital/index.html')">Adventure Capitalist</button>
+  <button class="gameBtn" onclick="startGame('AOC/index.html')">Ages of Conflict</button>
+  <button class="gameBtn" onclick="startGame('amongus/index.html')">Among Us</button>\
+  <button class="gameBtn" onclick="startGame('angrybirds/index.html')">angry birds</button>
+</div>
+
+<!-- TOP BAR (when in game) -->
+<div id="topBar">
+  <button id="backBtn" onclick="goBack()">⬅ Back</button>
+  <button id="blobBtn" onclick="openBlob()">Open in Blob</button>
+</div>
+
+<!-- GAME -->
+<iframe id="gameFrame"></iframe>
+
+<script>
+
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("topBar").style.display = "block";
+  document.getElementById("gameFrame").style.display = "block";
+  document.getElementById("gameFrame").src = url;
+
+
+function goBack() {
+  document.getElementById("gameFrame").src = "";
+  document.getElementById("gameFrame").style.display = "none";
+  document.getElementById("topBar").style.display = "none";
+  document.getElementById("menu").style.display = "block";
+}
+
+async function openBlob() {
+  if (!currentGame) return;
+
+  try {
+    const res = await fetch(currentGame);
+    const text = await res.text();
+
+    const blob = new Blob([text], { type: "text/html" });
+    const blobUrl = URL.createObjectURL(blob);
+
+    document.getElementById("gameFrame").src = blobUrl;
+  } catch {
+    alert("Blob failed");
+  }
+}
+</script>
+
+</body>
+</html>
+<script>
+let currentGame = "";
+
+function startGame(url) {
+  currentGame = url;
+
+  // hide menu
+  document.getElementById("menu").style.display = "none";
+
+  // show game + top bar
+  document.getElementById("topBar").style.display = "block";
+  document.getElementById("gameFrame").style.display = "block";
+
+  document.getElementById("gameFrame").src = url;
+}
+
+function goBack() {
+  const frame = document.getElementById("gameFrame");
+
+  frame.style.display = "none";
+  frame.src = "";
+
+  document.getElementById("topBar").style.display = "none";
+  document.getElementById("menu").style.display = "block";
+}
+</script>
+ 
+
+</body>
+</html>
