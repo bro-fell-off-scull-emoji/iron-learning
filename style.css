@@ -50,3 +50,10 @@ noscript {
   height: calc(100vh - 50px);
   border: none;
 }
+#menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical center */
+  align-items: center;     /* horizontal center */
+  height: 100vh;           /* full screen height */
+}
