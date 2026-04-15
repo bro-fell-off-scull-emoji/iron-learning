@@ -19,6 +19,9 @@ iframe {
   height: 100%;
   border: none;
 }
+::backdrop {
+  background: rgba(138, 0, 0, 0.696);
+}
 h1 {
   color: #ffb700;
   font-family: 'courier new', sans-serif;
@@ -30,25 +33,16 @@ h2 {
 h3 {
   color: #ffb700;
   font-family: 'courier new', sans-serif;
-#menu {
-  position: relative;
-  z-index: 10;
 }
-
-#topBar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 20;
+noscript {
+  color: #ffb700;
+  font-family: 'courier new', sans-serif;
 }
-
 #gameFrame {
   position: fixed;
-  top: 0;
+  top: 50px; /* height of top bar */
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: calc(100vh - 50px);
   border: none;
-  z-index: 5;
 }
