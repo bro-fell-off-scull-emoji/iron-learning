@@ -30,8 +30,25 @@ h2 {
 h3 {
   color: #ffb700;
   font-family: 'courier new', sans-serif;
+#menu {
+  position: relative;
+  z-index: 10;
 }
-noscript {
-  color: #ffb700;
-  font-family: 'courier new', sans-serif;
+
+#topBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 20;
+}
+
+#gameFrame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 5;
 }
