@@ -72,43 +72,29 @@ async function openBlob() {
 </body>
 </html>
 <script>
-function startGame(url) {
-document.getElementById("gameFrame").src = url;
-}
-</script>
-</script>
+let currentGame = "";
 
-<script>
+function startGame(url) {
+  currentGame = url;
+
   // hide menu
   document.getElementById("menu").style.display = "none";
 
   // show game + top bar
-  document.getElementById("gameFrame").style.display = "block";
   document.getElementById("topBar").style.display = "block";
+  document.getElementById("gameFrame").style.display = "block";
 
   document.getElementById("gameFrame").src = url;
-
-function goBack() {
-  // hide game UI
-  document.getElementById("gameFrame").style.display = "none";
-  document.getElementById("topBar").style.display = "none";
-
-  // show menu again
-  document.getElementById("menu").style.display = "block";
-
-  document.getElementById("gameFrame").src = "";
 }
 
-async function openBlob() {
-  if (!currentGame) return;
+function goBack() {
+  const frame = document.getElementById("gameFrame");
 
-  const res = await fetch(currentGame);
-  const text = await res.text();
+  frame.style.display = "none";
+  frame.src = "";
 
-  const blob = new Blob([text], { type: "text/html" });
-  const url = URL.createObjectURL(blob);
-
-  document.getElementById("gameFrame").src = url;
+  document.getElementById("topBar").style.display = "none";
+  document.getElementById("menu").style.display = "block";
 }
 </script>
  
