@@ -34,8 +34,7 @@
 
 <!-- TOP BAR (when in game) -->
 <div id="topBar">
-  <button id="backBtn" onclick="goBack()">⬅ Back</button>
-  <button id="blobBtn" onclick="openBlob()">Open in Blob</button>
+  <button id="backBtn" onclick="goBack()">⬅</button>
 </div>
 
 <!-- GAME -->
@@ -56,21 +55,6 @@ function goBack() {
   document.getElementById("menu").style.display = "block";
 }
 
-async function openBlob() {
-  if (!currentGame) return;
-
-  try {
-    const res = await fetch(currentGame);
-    const text = await res.text();
-
-    const blob = new Blob([text], { type: "text/html" });
-    const blobUrl = URL.createObjectURL(blob);
-
-    document.getElementById("gameFrame").src = blobUrl;
-  } catch {
-    alert("Blob failed");
-  }
-}
 </script>
 
 </body>
