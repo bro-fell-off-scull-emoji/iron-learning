@@ -14,6 +14,7 @@
 
 #gameFrame {
   display: none;
+size: 100% 100%;
 }
 </style>
   
@@ -32,16 +33,12 @@
 <iframe id="gameFrame"></iframe>
 
 <script>
-let currentGame = "";
-
-function startGame(url) {
-  currentGame = url;
 
   document.getElementById("menu").style.display = "none";
   document.getElementById("topBar").style.display = "block";
   document.getElementById("gameFrame").style.display = "block";
   document.getElementById("gameFrame").src = url;
-}
+
 
 function goBack() {
   document.getElementById("gameFrame").src = "";
