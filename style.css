@@ -19,9 +19,9 @@ iframe {
   height: 100%;
   border: none;
 }
-background{
-  background-color: rgb(75, 10, 10);
-
+body {
+  margin: 0;
+  background: #410202;
 }
 
 h1 {
