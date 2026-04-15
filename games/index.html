@@ -9,19 +9,21 @@
 }
 
 #topBar {
-  display: none;
-}
-
-  #gameFrame {
+  height: 50px;
   position: fixed;
   top: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+ #gameFrame {
+  position: fixed;
+  top: 50px;   /* space for top bar */
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 50px);
   border: none;
-
   display: none;
-  z-index: 1;
 }
 </style>
   
