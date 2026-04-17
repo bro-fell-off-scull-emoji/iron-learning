@@ -1,6 +1,6 @@
 button {
-  width: 100px;
-  height: 50px;
+  width: 85px;
+  height: 35px;
   background: rgb(63, 0, 121);
   color:  #ffb700;
   border: none;
@@ -64,4 +64,5 @@ noscript {
   border-radius: 10px;
   border: none;
   outline: none;
+  color:aqua;
 }
