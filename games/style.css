@@ -8,6 +8,10 @@ button {
   border-radius: 120px;
   cursor: pointer;
   transition: 0.3s;
+display: flex;
+  flex-wrap: wrap;    
+  justify-content: center;
+  gap: 10px;
 }
 body {
   background: maroon;
