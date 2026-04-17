@@ -29,7 +29,17 @@
 </style>
   
  <div id="menu">
-  <button class="gameBtn" onclick="startGame('adofai/index.html')">A Dance of Fire and Ice</button>
+   <div id="menu">
+
+  <!-- SEARCH BAR  -->
+  <input 
+    type="text" 
+    id="searchBar" 
+    placeholder="Search games..." 
+    onkeyup="searchGames()"
+   >
+    <!-- games -->
+    <button class="gameBtn" onclick="startGame('adofai/index.html')">A Dance of Fire and Ice</button>
   <button class="gameBtn" onclick="startGame('adventurecapital/index.html')">Adventure Capitalist</button>
   <button class="gameBtn" onclick="startGame('AOC/index.html')">Ages of Conflict</button>
   <button class="gameBtn" onclick="startGame('amongus/index.html')">Among Us</button>
@@ -49,7 +59,7 @@
   <button id="backBtn" onclick="goBack()">⬅</button>
 </div>
 
-<!-- GAME -->
+<!-- GAME ITSELF -->
 <iframe id="gameFrame"></iframe>
 
 <script>
@@ -87,6 +97,22 @@ async function openBlob() {
 </body>
 </html>
 <script>
+function searchGames() {
+  const input = document.getElementById("searchBar").value.toLowerCase();
+  const buttons = document.getElementsByClassName("gameBtn");
+
+  for (let i = 0; i < buttons.length; i++) {
+    const text = buttons[i].innerText.toLowerCase();
+
+    if (text.includes(input)) {
+      buttons[i].style.display = "block";
+    } else {
+      buttons[i].style.display = "none";
+    }
+  }
+}
+</script>
+
 let currentGame = "";
 
 function startGame(url) {
