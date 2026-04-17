@@ -8,7 +8,6 @@ button {
   border-radius: 120px;
   cursor: pointer;
   transition: 0.3s;
-}
 body {
   background: maroon;
   margin: 0;
@@ -55,6 +54,11 @@ noscript {
   justify-content: center; /* vertical center */
   align-items: center;     /* horizontal center */
   height: 100vh;           /* full screen height */
+  display: flex;
+  flex-wrap: wrap;    
+  justify-content: center;
+  gap: 10px;
+}
 }
 #searchBar {
   padding: 10px;
