@@ -86,9 +86,6 @@ noscript {
 }
 
 #topBar button {
+  width: auto;
   display: inline-block;
-  display: flex;
-  align-items: middle;
-  flex-direction: row!important;
-  margin-right: 10px;
 }
