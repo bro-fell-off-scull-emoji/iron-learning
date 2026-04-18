@@ -55,6 +55,7 @@ noscript {
 }
 #menu {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;      /* 👈 allows multiple rows */
   justify-content: center;
   gap: 15px;
