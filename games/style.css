@@ -84,3 +84,8 @@ noscript {
   padding: 10px;
   z-index: 9999;
 }
+
+#topBar button {
+  display: inline-block;
+  margin-right: 10px;
+}
