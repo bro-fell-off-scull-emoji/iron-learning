@@ -75,13 +75,12 @@ noscript {
   top: 0;
   left: 0;
   width: 100%;
-  display: none;
   display: flex !important;   
   flex-direction: row !important;
-  align-items: center;
+  align-items: middle;
   gap: 10px;
 
-  background: #0062ff;
+  background: transparent;
   padding: 10px;
   z-index: 9999;
 }
