@@ -75,8 +75,9 @@ noscript {
   top: 0;
   left: 0;
   width: 100%;
-  display: flex !important;   
-  flex-direction: row !important;
+  display: none;
+  display: flex;   
+  flex-direction: row;
   align-items: middle;
   gap: 10px;
   background: transparent;
