@@ -86,6 +86,8 @@ noscript {
 
 #topBar button {
   display: inline-block;
-  direction: ltr;
+  display: flex;
+  align-items: middle;
+  flex-direction: row!important;
   margin-right: 10px;
 }
