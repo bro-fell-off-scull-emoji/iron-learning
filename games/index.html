@@ -137,6 +137,36 @@ function searchGames() {
     }
   }
 }
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("topBar").style.display = "flex";
+
+  const frame = document.getElementById("gameFrame");
+  frame.style.display = "block";
+  frame.src = url;
+
+
+function goBack() {
+  const frame = document.getElementById("gameFrame");
+
+  frame.style.display = "none";
+  frame.src = "";
+
+  document.getElementById("topBar").style.display = "none";
+  document.getElementById("menu").style.display = "flex";
+}
+
+function goFullscreen() {
+  const frame = document.getElementById("gameFrame");
+
+  if (frame.requestFullscreen) {
+    frame.requestFullscreen();
+  }
+}
+
+function reloadGame() {
+  const frame = document.getElementById("gameFrame");
+  frame.src = frame.src;
+}
 </script>
  
 
