@@ -43,7 +43,7 @@
 <script>
 
   document.getElementById("menu").style.display = "none";
-  document.getElementById("topBar").style.display = "block";
+  document.getElementById("topBar").style.display = "flex";
   document.getElementById("gameFrame").style.display = "block";
   document.getElementById("gameFrame").src = url;
 
@@ -53,22 +53,6 @@ function goBack() {
   document.getElementById("gameFrame").style.display = "none";
   document.getElementById("topBar").style.display = "none";
   document.getElementById("menu").style.display = "block";
-}
-
-async function openBlob() {
-  if (!currentGame) return;
-
-  try {
-    const res = await fetch(currentGame);
-    const text = await res.text();
-
-    const blob = new Blob([text], { type: "text/html" });
-    const blobUrl = URL.createObjectURL(blob);
-
-    document.getElementById("gameFrame").src = blobUrl;
-  } catch {
-    alert("Blob failed");
-  }
 }
 </script>
 
@@ -85,7 +69,7 @@ function startGame(url) {
   document.getElementById("menu").style.display = "none";
 
   // show game + top bar
-  document.getElementById("topBar").style.display = "block";
+  document.getElementById("topBar").style.display = "flex";
   document.getElementById("gameFrame").style.display = "block";
 
   document.getElementById("gameFrame").src = url;
