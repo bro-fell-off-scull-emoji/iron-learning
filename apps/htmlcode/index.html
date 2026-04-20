@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Editor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1e1e1e;
+    --surface: #252526;
+    --panel: #2d2d2d;
+    --border: #3c3c3c;
+    --accent: #569cd6;
+    --text: #d4d4d4;
+    --muted: #858585;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+    --header-h: 48px;
+    --tabs-h: 35px;
+    --status-h: 22px;
+  }
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); overflow: hidden; }
+
+  /* TITLEBAR */
+  .titlebar {
+    height: var(--header-h); background: #323233; border-bottom: 1px solid #111;
+    display: flex; align-items: center; padding: 0 12px; gap: 10px;
+  }
+  .logo { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #569cd6; }
+  .logo em { color: var(--muted); font-style: normal; font-weight: 400; }
+
+  .menu-bar { display: flex; gap: 2px; }
+  .menu-item {
+    font-size: 12px; font-family: var(--sans); color: var(--muted);
+    padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: all 0.1s; position: relative;
+  }
+  .menu-item:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+  .menu-item:hover .dropdown, .menu-item.active .dropdown { display: block; }
+  .dropdown {
+    display: none; position: absolute; top: 100%; left: 0; background: #2d2d2d;
+    border: 1px solid var(--border); min-width: 220px; z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6); padding: 4px 0;
+  }
+  .dd-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 16px; font-size: 12px; cursor: pointer; color: var(--text); gap: 24px;
+    transition: background 0.1s;
+  }
+  .dd-item:hover { background: #094771; }
+  .dd-item .kbd { color: var(--muted); font-family: var(--mono); font-size: 11px; white-space: nowrap; }
+  .dd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+  .titlebar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .filename-input {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    font-family: var(--mono); font-size: 12px; padding: 5px 10px; outline: none; width: 160px;
+  }
+  .filename-input:focus { border-color: var(--accent); }
+
+  .btn {
+    font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 6px 14px; border: none; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+  }
+  .btn-primary { background: #0e639c; color: #fff; }
+  .btn-primary:hover { background: #1177bb; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text); }
+
+  /* TABS */
+  .tabs-bar {
+    height: var(--tabs-h); background: #2d2d2d; border-bottom: 1px solid #111;
+    display: flex; align-items: stretch; overflow-x: auto;
+  }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .tab {
+    height: 100%; padding: 0 16px; display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer;
+    border-right: 1px solid #111; white-space: nowrap; position: relative;
+    transition: color 0.1s, background 0.1s; min-width: 110px;
+  }
+  .tab.active { background: var(--bg); color: var(--text); }
+  .tab.active::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--accent); }
+  .tab-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .tab-x {
+    opacity: 0; font-size: 15px; line-height: 1; padding: 1px 3px;
+    border-radius: 2px; transition: all 0.1s; cursor: pointer; color: var(--muted);
+  }
+  .tab:hover .tab-x, .tab.active .tab-x { opacity: 0.6; }
+  .tab-x:hover { opacity: 1 !important; background: rgba(255,255,255,0.1); color: var(--text) !important; }
+  .tab-add {
+    width: 36px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--muted); cursor: pointer; flex-shrink: 0;
+  }
+  .tab-add:hover { color: var(--text); }
+
+  /* WORKSPACE */
+  .workspace { display: flex; height: calc(100vh - var(--header-h) - var(--tabs-h) - var(--status-h)); }
+
+  /* ACTIVITY BAR */
+  .activity-bar {
+    width: 48px; background: #333; display: flex; flex-direction: column;
+    align-items: center; padding: 8px 0; gap: 2px; border-right: 1px solid #111; flex-shrink: 0;
+  }
+  .act-icon {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--muted); font-size: 18px; border-radius: 4px;
+    transition: color 0.1s; position: relative;
+  }
+  .act-icon:hover { color: var(--text); }
+  .act-icon.on { color: var(--text); }
+  .act-icon.on::before { content: ''; position: absolute; left: -8px; top: 8px; bottom: 8px; width: 2px; background: var(--text); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; background: #252526; border-right: 1px solid #111;
+    display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; transition: width 0.2s;
+  }
+  .sidebar.collapsed { width: 0; }
+  .sidebar-head {
+    padding: 10px 14px; font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .sidebar-body { flex: 1; overflow-y: auto; padding: 4px 0; }
+  .ftree-item {
+    display: flex; align-items: center; gap: 6px; padding: 4px 14px;
+    font-size: 12px; cursor: pointer; color: var(--text); transition: background 0.1s;
+  }
+  .ftree-item:hover { background: rgba(255,255,255,0.04); }
+  .ftree-item.active { background: #094771; }
+  .ftree-size { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-left: auto; }
+
+  /* MAIN */
+  .main-area { flex: 1; display: flex; min-width: 0; overflow: hidden; }
+  .editor-half { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+  .preview-half { width: 50%; display: flex; flex-direction: column; border-left: 1px solid var(--border); flex-shrink: 0; overflow: hidden; }
+  .preview-half.hidden { display: none; }
+
+  .pane-head {
+    height: 28px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 12px; gap: 8px; flex-shrink: 0;
+  }
+  .pane-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .pane-info { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-left: auto; }
+
+  .preview-ctrls { margin-left: auto; display: flex; gap: 4px; }
+  .dev-btn {
+    font-size: 10px; padding: 2px 8px; background: transparent; border: 1px solid transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.1s;
+  }
+  .dev-btn:hover, .dev-btn.active { border-color: var(--border); color: var(--text); }
+
+  .editor-container { flex: 1; overflow: hidden; }
+
+  .preview-wrap { flex: 1; background: #111; display: flex; align-items: flex-start; justify-content: center; overflow: auto; }
+  .preview-wrap.full iframe { width: 100%; height: 100%; }
+  .preview-wrap.tablet { padding: 16px; }
+  .preview-wrap.tablet iframe { width: 768px; height: calc(100% - 32px); box-shadow: 0 0 0 1px #444, 0 12px 40px rgba(0,0,0,0.5); }
+  .preview-wrap.mobile { padding: 16px; }
+  .preview-wrap.mobile iframe { width: 390px; height: calc(100% - 32px); box-shadow: 0 0 0 1px #444, 0 12px 40px rgba(0,0,0,0.5); }
+  iframe { border: none; background: #fff; width: 100%; height: 100%; }
+
+  /* RESIZER */
+  .resizer {
+    width: 4px; background: transparent; cursor: col-resize; flex-shrink: 0; transition: background 0.15s;
+  }
+  .resizer:hover, .resizer.active { background: var(--accent); }
+
+  /* STATUS BAR */
+  .statusbar {
+    height: var(--status-h); background: #007acc; display: flex; align-items: center;
+    padding: 0 8px; gap: 0; flex-shrink: 0;
+  }
+  .st-item {
+    font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.9);
+    padding: 0 8px; height: 100%; display: flex; align-items: center; gap: 4px;
+    cursor: default; transition: background 0.1s; white-space: nowrap;
+  }
+  .st-item:hover { background: rgba(255,255,255,0.15); }
+  .st-right { margin-left: auto; display: flex; }
+
+  /* FLASH */
+  .flash {
+    position: fixed; bottom: 30px; right: 16px; background: #252526; color: var(--text);
+    border: 1px solid var(--border); font-size: 12px; padding: 10px 16px;
+    z-index: 1000; opacity: 0; transform: translateY(8px); transition: all 0.2s;
+    pointer-events: none; border-left: 3px solid #007acc; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .flash.show { opacity: 1; transform: translateY(0); }
+  .flash.ok { border-left-color: #4ec994; }
+  .flash.err { border-left-color: #f48771; }
+
+  /* CodeMirror overrides for VS Code feel */
+  .cm-editor { height: 100% !important; font-family: var(--mono) !important; font-size: 13px !important; }
+  .cm-editor.cm-focused { outline: none !important; }
+  .cm-scroller { overflow: auto !important; }
+  .cm-content { caret-color: #aeafad !important; padding: 8px 0 !important; }
+  .cm-gutters { background: var(--bg) !important; border-right: 1px solid var(--border) !important; color: #495162 !important; }
+  .cm-lineNumbers .cm-gutterElement { padding: 0 16px 0 8px !important; min-width: 48px !important; text-align: right; }
+  .cm-activeLineGutter { background: #2a2d2e !important; color: #c6c6c6 !important; }
+  .cm-activeLine { background: #2a2d2e80 !important; }
+  .cm-selectionBackground { background: #264f78 !important; }
+  .cm-cursor { border-left-color: #aeafad !important; border-left-width: 2px !important; }
+  .cm-matchingBracket { background: rgba(0,100,0,0.1) !important; outline: 1px solid #888 !important; }
+  .cm-foldGutter .cm-gutterElement { cursor: pointer; color: var(--muted); }
+  .cm-tooltip { background: #252526 !important; border: 1px solid #454545 !important; box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important; }
+  .cm-tooltip-autocomplete > ul { background: #252526 !important; padding: 4px 0 !important; }
+  .cm-tooltip-autocomplete > ul > li { font-family: var(--mono) !important; font-size: 12px !important; padding: 3px 10px !important; }
+  .cm-tooltip-autocomplete > ul > li[aria-selected] { background: #094771 !important; }
+  .cm-searchMatch { background: rgba(234,92,0,0.33) !important; outline: 1px solid #ea5c00 !important; }
+  .cm-searchMatch.cm-searchMatch-selected { background: rgba(255,160,0,0.4) !important; }
+  .cm-panels { background: #252526 !important; border-top: 1px solid var(--border) !important; }
+  .cm-panel { padding: 6px 8px !important; }
+  .cm-panel input[type=text] { background: #3c3c3c !important; color: var(--text) !important; border: 1px solid #555 !important; font-family: var(--mono) !important; font-size: 12px !important; padding: 3px 6px !important; outline: none !important; }
+  .cm-panel input[type=text]:focus { border-color: var(--accent) !important; }
+  .cm-panel button { background: #3c3c3c !important; color: var(--text) !important; border: 1px solid #555 !important; cursor: pointer !important; padding: 3px 8px !important; font-size: 11px !important; }
+  .cm-panel button:hover { background: #094771 !important; }
+  .cm-panel label { color: var(--muted) !important; font-size: 11px !important; }
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+  <div class="logo">HTML<em>/</em>Editor</div>
+  <div class="menu-bar">
+
+    <div class="menu-item">File<div class="dropdown">
+      <div class="dd-item" onclick="newTab()"><span>New File</span><span class="kbd">Ctrl+N</span></div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" onclick="downloadCurrent()"><span>Download Current</span><span class="kbd">Ctrl+S</span></div>
+      <div class="dd-item" onclick="downloadAll()"><span>Download All Tabs</span></div>
+    </div></div>
+
+    <div class="menu-item">Edit<div class="dropdown">
+      <div class="dd-item" onclick="doUndo()"><span>Undo</span><span class="kbd">Ctrl+Z</span></div>
+      <div class="dd-item" onclick="doRedo()"><span>Redo</span><span class="kbd">Ctrl+Y</span></div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" onclick="doSearch()"><span>Find</span><span class="kbd">Ctrl+F</span></div>
+      <div class="dd-item" onclick="doSearch()"><span>Find &amp; Replace</span><span class="kbd">Ctrl+H</span></div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" onclick="formatCode()"><span>Format Document</span><span class="kbd">Shift+Alt+F</span></div>
+      <div class="dd-item" onclick="commentLine()"><span>Toggle Comment</span><span class="kbd">Ctrl+/</span></div>
+      <div class="dd-item" onclick="duplicateLine()"><span>Duplicate Line</span><span class="kbd">Shift+Alt+D</span></div>
+    </div></div>
+
+    <div class="menu-item">View<div class="dropdown">
+      <div class="dd-item" onclick="toggleSidebar()"><span>Explorer</span><span class="kbd">Ctrl+B</span></div>
+      <div class="dd-item" onclick="togglePreview()"><span>Toggle Preview</span></div>
+      <div class="dd-sep"></div>
+      <div class="dd-item" onclick="setDevice('full')"><span>Full Width Preview</span></div>
+      <div class="dd-item" onclick="setDevice('tablet')"><span>Tablet (768px)</span></div>
+      <div class="dd-item" onclick="setDevice('mobile')"><span>Mobile (390px)</span></div>
+    </div></div>
+
+  </div>
+
+  <div class="titlebar-right">
+    <input class="filename-input" id="filename" type="text" value="index.html" spellcheck="false" placeholder="filename.html">
+    <button class="btn btn-ghost" onclick="formatCode()">✨ Format</button>
+    <button class="btn btn-primary" onclick="downloadCurrent()">↓ Download</button>
+  </div>
+</div>
+
+<div class="tabs-bar" id="tabs-bar"></div>
+
+<div class="workspace">
+
+  <div class="activity-bar">
+    <div class="act-icon on" id="act-explorer" title="Explorer (Ctrl+B)" onclick="toggleSidebar()">⬚</div>
+    <div class="act-icon" title="Find (Ctrl+F)" onclick="doSearch()">⊕</div>
+    <div class="act-icon" title="Format" onclick="formatCode()">⁒</div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-head">Explorer</div>
+    <div class="sidebar-body" id="file-tree"></div>
+  </div>
+
+  <div class="main-area">
+    <div class="editor-half">
+      <div class="pane-head">
+        <span class="pane-lbl" id="pane-name">index.html</span>
+        <span class="pane-info" id="pane-info"></span>
+      </div>
+      <div class="editor-container" id="editor-container"></div>
+    </div>
+
+    <div class="resizer" id="resizer"></div>
+
+    <div class="preview-half" id="preview-half">
+      <div class="pane-head">
+        <span class="pane-lbl">Preview</span>
+        <div class="preview-ctrls">
+          <button class="dev-btn active" id="dev-full"   onclick="setDevice('full')">Full</button>
+          <button class="dev-btn"        id="dev-tablet" onclick="setDevice('tablet')">Tablet</button>
+          <button class="dev-btn"        id="dev-mobile" onclick="setDevice('mobile')">Mobile</button>
+        </div>
+      </div>
+      <div class="preview-wrap full" id="preview-wrap">
+        <iframe id="preview" sandbox="allow-scripts allow-same-origin allow-forms" title="Preview"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="st-item">⚡ HTML Editor</div>
+  <div class="st-right">
+    <div class="st-item" id="st-cursor">Ln 1, Col 1</div>
+    <div class="st-item" id="st-sel"></div>
+    <div class="st-item">UTF-8</div>
+    <div class="st-item">HTML</div>
+    <div class="st-item" id="st-lines">1 line</div>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script type="module">
+import { EditorState } from 'https://esm.sh/@codemirror/state@6';
+import {
+  EditorView, keymap, lineNumbers, highlightActiveLine,
+  highlightActiveLineGutter, drawSelection, dropCursor,
+  rectangularSelection, crosshairCursor, highlightSpecialChars, scrollPastEnd
+} from 'https://esm.sh/@codemirror/view@6';
+import {
+  defaultKeymap, history, historyKeymap, indentWithTab, undo, redo
+} from 'https://esm.sh/@codemirror/commands@6';
+import {
+  foldGutter, indentOnInput, syntaxHighlighting,
+  defaultHighlightStyle, bracketMatching, foldKeymap, codeFolding
+} from 'https://esm.sh/@codemirror/language@6';
+import {
+  autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
+} from 'https://esm.sh/@codemirror/autocomplete@6';
+import {
+  search, searchKeymap, highlightSelectionMatches,
+  openSearchPanel
+} from 'https://esm.sh/@codemirror/search@6';
+import { lintKeymap } from 'https://esm.sh/@codemirror/lint@6';
+import { html } from 'https://esm.sh/@codemirror/lang-html@6';
+import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark@6';
+
+// ── State ──────────────────────────────────────────────────────────
+const DEFAULT = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Page</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #eee;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 52px 64px;
+      text-align: center;
+      max-width: 500px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #4fc3f7, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.75;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(79, 195, 247, 0.15);
+      border: 1px solid rgba(79, 195, 247, 0.3);
+      color: #4fc3f7;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      margin-bottom: 28px;
+    }
+
+    button {
+      padding: 13px 36px;
+      background: linear-gradient(135deg, #4fc3f7, #a78bfa);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(167, 139, 250, 0.35);
+    }
+
+    button:active { transform: translateY(0); opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">✦ HTML Editor</div>
+    <h1>Hello, world!</h1>
+    <p>Edit the code on the left. The preview updates automatically.</p>
+    <p>Try editing styles, adding elements, or writing JavaScript.</p>
+    <button onclick="this.textContent = '✓ It works!'">Click me</button>
+  </div>
+</body>
+</html>`;
+
+let tabs = [{ id: 1, name: 'index.html', content: DEFAULT, view: null }];
+let activeId = 1;
+let nextId = 2;
+let previewTimer = null;
+let sidebarOpen = true;
+let previewOpen = true;
+
+// ── Extensions ─────────────────────────────────────────────────────
+function makeExtensions(tabId) {
+  return [
+    lineNumbers(),
+    highlightActiveLineGutter(),
+    highlightSpecialChars(),
+    history(),
+    foldGutter(),
+    codeFolding(),
+    drawSelection(),
+    dropCursor(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+    bracketMatching(),
+    closeBrackets(),
+    autocompletion({ activateOnTyping: true }),
+    rectangularSelection(),
+    crosshairCursor(),
+    highlightActiveLine(),
+    highlightSelectionMatches(),
+    search(),
+    scrollPastEnd(),
+    html(),
+    oneDark,
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+      indentWithTab,
+    ]),
+    EditorView.updateListener.of(upd => {
+      if (upd.docChanged) {
+        const t = tabs.find(x => x.id === tabId);
+        if (t) t.content = upd.state.doc.toString();
+        schedulePreview();
+        refreshTree();
+      }
+      if (upd.docChanged || upd.selectionSet) updateStats(upd.view);
+    }),
+  ];
+}
+
+// ── Create/destroy view ────────────────────────────────────────────
+function mountView(tab) {
+  document.getElementById('editor-container').innerHTML = '';
+  const state = EditorState.create({ doc: tab.content, extensions: makeExtensions(tab.id) });
+  tab.view = new EditorView({ state, parent: document.getElementById('editor-container') });
+}
+
+// ── Init ───────────────────────────────────────────────────────────
+mountView(tabs[0]);
+renderTabs();
+refreshTree();
+schedulePreview();
+
+// ── Tabs ───────────────────────────────────────────────────────────
+function renderTabs() {
+  const bar = document.getElementById('tabs-bar');
+  bar.innerHTML = '';
+  tabs.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'tab' + (t.id === activeId ? ' active' : '');
+    div.innerHTML = `<span class="tab-name">📄 ${t.name}</span><span class="tab-x" data-id="${t.id}">×</span>`;
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('tab-x')) return;
+      switchTab(t.id);
+    });
+    div.querySelector('.tab-x').addEventListener('click', e => { e.stopPropagation(); closeTab(t.id); });
+    bar.appendChild(div);
+  });
+  const plus = document.createElement('div');
+  plus.className = 'tab-add'; plus.textContent = '+'; plus.title = 'New File (Ctrl+N)';
+  plus.onclick = () => newTab();
+  bar.appendChild(plus);
+
+  document.getElementById('filename').value = tabs.find(t => t.id === activeId)?.name || '';
+  document.getElementById('pane-name').textContent = tabs.find(t => t.id === activeId)?.name || '';
+}
+
+function switchTab(id) {
+  const cur = tabs.find(t => t.id === activeId);
+  if (cur?.view) { cur.content = cur.view.state.doc.toString(); cur.view.destroy(); cur.view = null; }
+  activeId = id;
+  mountView(tabs.find(t => t.id === id));
+  renderTabs();
+  refreshTree();
+  schedulePreview();
+}
+
+function closeTab(id) {
+  if (tabs.length === 1) { flash('Cannot close the last tab', 'err'); return; }
+  const t = tabs.find(x => x.id === id);
+  if (t?.view) { t.view.destroy(); t.view = null; }
+  tabs = tabs.filter(x => x.id !== id);
+  if (activeId === id) switchTab(tabs[tabs.length - 1].id);
+  else renderTabs();
+}
+
+window.newTab = function() {
+  const id = nextId++;
+  const name = `untitled-${id}.html`;
+  tabs.push({ id, name, content: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Untitled</title>\n</head>\n<body>\n  \n</body>\n</html>`, view: null });
+  switchTab(id);
+};
+
+// ── File Tree ──────────────────────────────────────────────────────
+function refreshTree() {
+  const tree = document.getElementById('file-tree');
+  tree.innerHTML = '';
+  tabs.forEach(t => {
+    const bytes = new Blob([t.content]).size;
+    const sz = bytes < 1024 ? bytes + 'B' : (bytes/1024).toFixed(1) + 'KB';
+    const div = document.createElement('div');
+    div.className = 'ftree-item' + (t.id === activeId ? ' active' : '');
+    div.innerHTML = `<span>📄</span><span style="flex:1;font-family:var(--mono);font-size:12px;">${t.name}</span><span class="ftree-size">${sz}</span>`;
+    div.onclick = () => switchTab(t.id);
+    tree.appendChild(div);
+  });
+}
+
+// ── Preview ────────────────────────────────────────────────────────
+function schedulePreview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => {
+    const t = tabs.find(x => x.id === activeId);
+    if (!t) return;
+    try {
+      const ifr = document.getElementById('preview');
+      const doc = ifr.contentDocument || ifr.contentWindow.document;
+      doc.open(); doc.write(t.content); doc.close();
+    } catch(e) {}
+  }, 300);
+}
+
+// ── Stats ──────────────────────────────────────────────────────────
+function updateStats(view) {
+  const state = view.state;
+  const doc = state.doc;
+  const sel = state.selection.main;
+  const line = doc.lineAt(sel.head);
+  const col = sel.head - line.from + 1;
+  document.getElementById('st-cursor').textContent = `Ln ${line.number}, Col ${col}`;
+  document.getElementById('st-lines').textContent = `${doc.lines} ${doc.lines === 1 ? 'line' : 'lines'}`;
+  document.getElementById('pane-info').textContent = `${doc.length} chars`;
+  document.getElementById('st-sel').textContent = sel.empty ? '' : `(${sel.to - sel.from} sel)`;
+}
+
+// ── Format ─────────────────────────────────────────────────────────
+window.formatCode = function() {
+  const t = tabs.find(x => x.id === activeId);
+  if (!t?.view) return;
+  const raw = t.view.state.doc.toString();
+  const VOID = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+  const lines = raw.replace(/>\s*\n\s*</g, '>\n<').replace(/>\s+</g, '>\n<').split('\n');
+  let indent = 0, out = '';
+  for (let r of lines) {
+    const line = r.trim();
+    if (!line) { out += '\n'; continue; }
+    const tag = (line.match(/^<\/?([a-z0-9!]+)/i) || [])[1]?.toLowerCase();
+    const isClose = /^<\//.test(line);
+    const isVoid = tag && VOID.has(tag);
+    const isSelf = /\/>$/.test(line);
+    const opens = !isClose && !isVoid && !isSelf && /^<[a-z]/i.test(line) && !/<\/[a-z]/.test(line);
+    if (isClose && indent > 0) indent--;
+    out += '  '.repeat(indent) + line + '\n';
+    if (opens) indent++;
+  }
+  t.view.dispatch({ changes: { from: 0, to: t.view.state.doc.length, insert: out.trim() + '\n' } });
+  flash('✨ Document formatted');
+};
+
+// ── Comment / Duplicate ────────────────────────────────────────────
+window.commentLine = function() {
+  const t = tabs.find(x => x.id === activeId);
+  if (!t?.view) return;
+  const state = t.view.state;
+  const sel = state.selection.main;
+  const line = state.doc.lineAt(sel.head);
+  const text = line.text.trim();
+  let newText;
+  if (text.startsWith('<!--') && text.endsWith('-->')) {
+    newText = text.slice(4, -3).trim();
+  } else {
+    newText = `<!-- ${line.text.trim()} -->`;
+  }
+  t.view.dispatch({ changes: { from: line.from, to: line.to, insert: newText } });
+};
+
+window.duplicateLine = function() {
+  const t = tabs.find(x => x.id === activeId);
+  if (!t?.view) return;
+  const state = t.view.state;
+  const sel = state.selection.main;
+  const line = state.doc.lineAt(sel.head);
+  t.view.dispatch({ changes: { from: line.to, to: line.to, insert: '\n' + line.text } });
+};
+
+// ── Search ─────────────────────────────────────────────────────────
+window.doSearch = function() {
+  const t = tabs.find(x => x.id === activeId);
+  if (t?.view) openSearchPanel(t.view);
+};
+
+// ── Undo/Redo ──────────────────────────────────────────────────────
+window.doUndo = function() { const t = tabs.find(x => x.id === activeId); if (t?.view) undo(t.view); };
+window.doRedo = function() { const t = tabs.find(x => x.id === activeId); if (t?.view) redo(t.view); };
+
+// ── Download ───────────────────────────────────────────────────────
+window.downloadCurrent = function() {
+  const t = tabs.find(x => x.id === activeId);
+  if (!t) return;
+  let name = document.getElementById('filename').value.trim() || t.name;
+  if (!name.endsWith('.html')) name += '.html';
+  t.name = name;
+  dlFile(name, t.content);
+  flash(`↓ ${name} downloaded`, 'ok');
+  renderTabs(); refreshTree();
+};
+
+window.downloadAll = function() {
+  tabs.forEach(t => dlFile(t.name, t.content));
+  flash(`↓ ${tabs.length} file${tabs.length > 1 ? 's' : ''} downloaded`, 'ok');
+};
+
+function dlFile(name, content) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: 'text/html' }));
+  a.download = name; a.click();
+}
+
+// ── UI Toggles ─────────────────────────────────────────────────────
+window.toggleSidebar = function() {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+  document.getElementById('act-explorer').classList.toggle('on', sidebarOpen);
+};
+
+window.togglePreview = function() {
+  previewOpen = !previewOpen;
+  document.getElementById('preview-half').classList.toggle('hidden', !previewOpen);
+};
+
+window.setDevice = function(mode) {
+  document.getElementById('preview-wrap').className = 'preview-wrap ' + mode;
+  ['full','tablet','mobile'].forEach(m => document.getElementById('dev-'+m)?.classList.toggle('active', m === mode));
+};
+
+// ── Flash ──────────────────────────────────────────────────────────
+function flash(msg, type = '') {
+  const el = document.getElementById('flash');
+  el.textContent = msg;
+  el.className = 'flash show' + (type ? ' '+type : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Resizer ────────────────────────────────────────────────────────
+const resizer = document.getElementById('resizer');
+let dragging = false;
+resizer.addEventListener('mousedown', e => { dragging = true; resizer.classList.add('active'); e.preventDefault(); });
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const main = document.querySelector('.main-area');
+  const rect = main.getBoundingClientRect();
+  const pct = Math.max(25, Math.min(80, ((e.clientX - rect.left) / rect.width) * 100));
+  document.querySelector('.editor-half').style.flex = `0 0 ${pct}%`;
+  document.querySelector('.preview-half').style.width = `${100-pct}%`;
+  document.querySelector('.preview-half').style.flex = 'none';
+});
+document.addEventListener('mouseup', () => { dragging = false; resizer.classList.remove('active'); });
+
+// ── Global keyboard shortcuts ──────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const m = e.ctrlKey || e.metaKey;
+  if (m && e.key === 's') { e.preventDefault(); window.downloadCurrent(); }
+  if (m && e.key === 'n') { e.preventDefault(); window.newTab(); }
+  if (m && e.key === 'b') { e.preventDefault(); window.toggleSidebar(); }
+  if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'f') { e.preventDefault(); window.formatCode(); }
+});
+
+// Filename input sync
+document.getElementById('filename').addEventListener('input', e => {
+  const t = tabs.find(x => x.id === activeId);
+  if (t) { t.name = e.target.value; document.getElementById('pane-name').textContent = e.target.value; renderTabs(); refreshTree(); }
+});
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.menu-item')) document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+});
+</script>
+</body>
+</html>
